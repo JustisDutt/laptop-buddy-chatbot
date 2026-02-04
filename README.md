@@ -140,7 +140,11 @@ laptop-buddy-chatbot/
 │       decision points, and error recovery.
 │
 ├── slides/
-│   └── (Presentation PDF to be added)
+│   └── Presentation PDF
+|
+|
+├── screenshots/
+|    └── Example screenshots
 │
 └── README.md
     Project overview, setup instructions, design rationale, and examples.
