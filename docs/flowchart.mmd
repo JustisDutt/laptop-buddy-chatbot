@@ -1,12 +1,41 @@
 flowchart TD
-  A[Start] --> B[Ask budget]
-  B --> C{Valid number?}
-  C -- No --> B
-  C -- Yes --> D[Ask use case]
-  D --> E{Recognized?}
-  E -- No --> D
-  E -- Yes --> F[Ask portability]
-  F --> G{Valid?}
-  G -- No --> F
-  G -- Yes --> H[Ask OS]
-  H --> I[Give recommendation]
+
+    A[Start Chat] --> B[Ask Budget]
+
+
+    B --> C{Valid number?}
+        C -- No --> B1[Explain expected number<br/>Ask again]
+        C -- Yes --> C2{Budget >= $300?}
+        C2 -- No --> B2[Warn budget too low<br/>Ask again]
+        C2 -- Yes --> D[Ask Use Case]
+
+    D --> E{Recognized use case?}
+        E -- No --> D1[Show valid options<br/>Ask again]
+        E -- Yes --> E2{Gaming + Low Budget?}
+        E2 -- Yes --> E3[Warn about gaming costs]
+        E2 -- No --> F[Ask Portability]
+
+    E3 --> F
+
+    F --> G{Valid portability?}
+        G -- No --> F1[Explain options<br/>Ask again]
+        G -- Yes --> H[Ask OS Preference]
+
+    H --> I{Valid OS?}
+        I -- No --> H1[Explain options<br/>Ask again]
+        I -- Yes --> J[Compute Recommendation]
+
+    J --> K[Show Specs + Notes]
+
+    K --> L{User input}
+        L -- why --> M[Explain Reasoning]
+        L -- restart --> B
+        L -- other --> K
+
+%% Global commands
+
+    X((help)) --> Y[Show Help Info]
+        Y --> L
+
+
+    Z((restart)) --> B
