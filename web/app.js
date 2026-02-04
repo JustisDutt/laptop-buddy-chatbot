@@ -25,25 +25,30 @@ function reset() {
   chat.innerHTML = "";
   step = "BUDGET";
   data = {};
-  bot("Hi! I’ll help you choose a laptop. You can type 'help' or 'restart' at any time.");
-  bot("First question: what is your budget in USD? (example: 900)");
+
+  bot("Hi! I’ll help you choose a laptop.");
+  bot("You can type: help, restart, or why at any time.");
+  bot("First question: what’s your budget in USD? (example: 700)");
 }
 
 function showHelp() {
   bot(
-    "Help menu:\n" +
-    "- Enter numbers for budget (example: 800)\n" +
-    "- Use cases: school, gaming, work, creative\n" +
-    "- Portability: high, medium, low\n" +
-    "- Type 'why' to see reasoning\n" +
-    "- Type 'restart' to start over"
+    "I can help with:\n\n" +
+    "• Budget: numbers like 600 or 1200\n" +
+    "• Use case: school, gaming, work, creative\n" +
+    "• Portability: high, medium, low\n\n" +
+    "Commands:\n" +
+    "• help – show this message\n" +
+    "• why – explain my recommendation\n" +
+    "• restart – start over"
   );
 }
 
 reset();
 
 send.onclick = () => {
-  const text = input.value.trim().toLowerCase();
+  const raw = input.value.trim();
+  const text = raw.toLowerCase();
   input.value = "";
 
   if (!text) {
@@ -51,9 +56,9 @@ send.onclick = () => {
     return;
   }
 
-  user(text);
+  user(raw);
 
-  // GLOBAL COMMANDS
+  /* ---------- Global commands ---------- */
   if (text === "restart") {
     reset();
     return;
@@ -66,87 +71,150 @@ send.onclick = () => {
 
   if (text === "why" && step === "DONE") {
     bot(
-      `I recommended this because:
-- Budget: $${data.budget}
-- Use case: ${data.use}
-- Portability: ${data.portability}
-- OS preference: ${data.os}
-
-These factors balance performance, cost, and usability.`
+      "Here’s how I decided:\n\n" +
+      `• Budget: $${data.budget}\n` +
+      `• Use case: ${data.use}\n` +
+      `• Portability: ${data.portability}\n` +
+      `• OS preference: ${data.os}\n\n` +
+      "Laptop hardware scales strongly with price, so specs are matched to realistic market tiers."
     );
     return;
   }
 
-  // STEP: BUDGET
+  /* ---------- Budget step ---------- */
   if (step === "BUDGET") {
     const num = parseInt(text.replace(/\D/g, ""));
     if (isNaN(num)) {
-      bot("I was expecting a number like 900. Could you try again?");
+      bot("I need a number for budget. Example: 700.");
       return;
     }
     if (num < 300) {
-      bot("That budget is very low for a laptop. If possible, consider at least $300.");
+      bot(
+        "That budget is very low for a new laptop.\n\n" +
+        "If possible, try at least $300 for acceptable performance."
+      );
       return;
     }
+
     data.budget = num;
     step = "USE";
-    bot("What will you mainly use the laptop for? (school, gaming, work, creative)");
+    bot(
+      "Got it.\n\n" +
+      "What will you mainly use the laptop for?\n" +
+      "Options: school, gaming, work, creative"
+    );
     return;
   }
 
-  // STEP: USE CASE
+  /* ---------- Use case step ---------- */
   if (step === "USE") {
     if (!["school", "gaming", "work", "creative"].includes(text)) {
-      bot("I didn’t recognize that. Please choose: school, gaming, work, or creative.");
+      bot(
+        "I didn’t recognize that.\n\n" +
+        "Please choose one of: school, gaming, work, creative."
+      );
       return;
     }
+
     data.use = text;
 
-    if (text === "gaming" && data.budget < 600) {
-      bot("Just a heads-up: gaming laptops usually need a higher budget for good performance.");
+    if (text === "gaming" && data.budget < 800) {
+      bot(
+        "Quick heads-up:\n\n" +
+        "Gaming laptops with dedicated GPUs usually start closer to $800–$900."
+      );
     }
 
     step = "PORTABILITY";
-    bot("How important is portability? (high, medium, low)");
+    bot(
+      "How important is portability?\n\n" +
+      "Options:\n" +
+      "• high – carry it often\n" +
+      "• medium – some travel\n" +
+      "• low – mostly stays on a desk"
+    );
     return;
   }
 
-  // STEP: PORTABILITY
+  /* ---------- Portability step ---------- */
   if (step === "PORTABILITY") {
     if (!["high", "medium", "low"].includes(text)) {
       bot("Please answer with: high, medium, or low.");
       return;
     }
+
     data.portability = text;
     step = "OS";
-    bot("Do you prefer Windows or Mac? (or type 'either')");
+    bot(
+      "Any OS preference?\n\n" +
+      "Options: windows, mac, or either"
+    );
     return;
   }
 
-  // STEP: OS
+  /* ---------- OS + Recommendation ---------- */
   if (step === "OS") {
     if (!["windows", "mac", "either"].includes(text)) {
-      bot("Please answer with: windows, mac, or either.");
+      bot("Please answer: windows, mac, or either.");
       return;
     }
+
     data.os = text;
 
-    let recommendation = "a balanced mid-range laptop";
-    if (data.use === "gaming") recommendation = "a gaming laptop with a dedicated GPU";
-    if (data.use === "school") recommendation = "a lightweight laptop with good battery life";
-    if (data.use === "creative") recommendation = "a laptop with strong CPU and high-quality display";
+    const b = data.budget;
+    const u = data.use;
+
+    let specs = "";
+    let notes = "";
+
+    if (u === "school" || u === "work") {
+      if (b < 600) {
+        specs = "8GB RAM, 256GB SSD, integrated graphics";
+        notes = "Good for documents, browsing, and basic multitasking.";
+      } else if (b < 900) {
+        specs = "8–16GB RAM, 512GB SSD, integrated graphics";
+        notes = "Comfortable for heavier multitasking and longevity.";
+      } else {
+        specs = "16GB RAM, 512GB–1TB SSD, integrated graphics";
+        notes = "Prioritize build quality and battery life.";
+      }
+    }
+
+    if (u === "gaming") {
+      if (b < 800) {
+        specs = "8–16GB RAM, integrated graphics";
+        notes = "Only light or older games at low settings.";
+      } else if (b < 1200) {
+        specs = "16GB RAM, 512GB SSD, entry-level dedicated GPU";
+        notes = "Playable modern games at medium settings.";
+      } else {
+        specs = "16–32GB RAM, 1TB SSD, strong dedicated GPU";
+        notes = "High settings and better future-proofing.";
+      }
+    }
+
+    if (u === "creative") {
+      if (b < 900) {
+        specs = "16GB RAM, 512GB SSD, integrated graphics";
+        notes = "Fine for light photo/video work.";
+      } else if (b < 1300) {
+        specs = "16–32GB RAM, 512GB–1TB SSD, dedicated GPU recommended";
+        notes = "Much better for video editing and design tools.";
+      } else {
+        specs = "32GB RAM, 1TB+ SSD, strong dedicated GPU";
+        notes = "Ideal for demanding creative workloads.";
+      }
+    }
 
     bot(
-      `Recommendation:\n` +
-      `Based on your answers, I recommend ${recommendation}.\n\n` +
-      `Key specs to look for:\n` +
-      `- 16GB RAM\n` +
-      `- SSD storage\n` +
-      `- Price around $${data.budget}\n\n` +
-      `Type 'why' to see how I decided, or 'restart' to try again.`
+      "Here’s my recommendation 👇\n\n" +
+      "Look for a laptop with:\n" +
+      `• ${specs}\n` +
+      `• Price around $${b}\n\n` +
+      `Notes: ${notes}\n\n` +
+      "Type \"why\" to see my reasoning, or \"restart\" to try again."
     );
 
     step = "DONE";
-    return;
   }
 };
