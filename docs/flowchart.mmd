@@ -1,0 +1,12 @@
+flowchart TD
+  A[Start] --> B[Ask budget]
+  B --> C{Valid number?}
+  C -- No --> B
+  C -- Yes --> D[Ask use case]
+  D --> E{Recognized?}
+  E -- No --> D
+  E -- Yes --> F[Ask portability]
+  F --> G{Valid?}
+  G -- No --> F
+  G -- Yes --> H[Ask OS]
+  H --> I[Give recommendation]
