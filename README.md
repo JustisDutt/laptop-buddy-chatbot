@@ -56,17 +56,31 @@ The chatbot is designed to handle common edge cases gracefully.
 **User:** `cheap`  
 **Bot:** Explains that a number is required and asks again.
 
+![Non-numeric budget error](screenshots/error-non-numeric-budget.png)
+
+--- 
+
 ### Example 2: Unrealistic budget
 **User:** `$200`  
 **Bot:** Warns that this budget is too low for a new laptop and suggests a realistic minimum.
+
+![Low budget warning](screenshots/low-budget-warning.png)
+
+---
 
 ### Example 3: Gaming with low budget
 **User:** Budget `$600`, Use case `gaming`  
 **Bot:** Warns that gaming laptops with dedicated GPUs usually cost more and adjusts expectations.
 
+![Gaming low budget warning](screenshots/gaming-low-budget-warning.png)
+
+---
+
 ### Example 4: Unknown option
 **User:** `everything`  
 **Bot:** Explains valid options and asks the user to choose again.
+
+![Unrecognized option handling](screenshots/unrecognized-option.png)
 
 ---
 
